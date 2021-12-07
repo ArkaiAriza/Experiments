@@ -1,66 +1,82 @@
 import React, { useEffect, useState } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styled from 'styled-components';
+import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import styled, { css } from 'styled-components';
 import axios from 'axios';
-
 import Item from './Item';
 
 const StyledContainer = styled.div`
-  position: relative;
+  position: absolute;
   display: flex;
+  flex-direction: row;
   height: 500px;
   width: 100%;
-  background-color: #111;
+  background-color: #333;
   overflow: visible;
   align-items: center;
 `;
 
 const Exp1 = () => {
-  const [list, setList] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(0);
+  const [items, setItems] = useState([]);
+  const [active, setActive] = useState(0);
+  const [direction, setDirection] = useState('');
 
   useEffect(() => {
     const request = async () => {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/popular?api_key=7628678618ac32f475108f4113de77d8`
       );
-      setList(response.data.results);
+      setItems(response.data.results);
     };
     request();
   }, []);
 
   const handleSelection = (index) => {
-    setSelectedItem(index);
+    //setSelectedItem(index);
+  };
+
+  const moveLeft = () => {
+    var newActive = active;
+    newActive--;
+    setActive(newActive < 0 ? items.length - 1 : newActive);
+    setDirection('left');
+  };
+
+  const moveRight = () => {
+    var newActive = active;
+    setActive((newActive + 1) % items.length);
+    setDirection('right');
   };
 
   const renderItems = () => {
-    const base = 35;
-    const separation = 40;
+    const base = 27;
+    const separation = 46;
 
-    var items = [];
+    var it = [];
     var itemIndex = 0;
+    console.log(active);
 
-    for (var i = -2; i < 3; i++) {
-      if (selectedItem + i < 0) itemIndex = selectedItem + i + list.length;
-      else if (selectedItem + i > list.length - 1)
-        itemIndex = selectedItem + i - list.length;
-      else itemIndex = selectedItem + i;
-
-      items.push({ movie: list[itemIndex], itemIndex });
+    for (var i = active - 2; i < active + 3; i++) {
+      var index = i;
+      if (i < 0) {
+        index = items.length + i;
+      } else if (i >= items.length) {
+        index = i % items.length;
+      }
+      console.log(index);
+      it.push({ movie: items[index], index });
     }
+    console.log(it);
 
-    console.log(items);
-
-    return items.map(({ itemIndex, movie }, index) => {
+    return it.map(({ itemIndex, movie }, index) => {
+      console.log(movie);
       if (index < 2) {
         return (
           <Item
             key={movie.id}
             movie={movie}
-            onSelected={() => handleSelection(itemIndex)}
+            onClick={() => moveLeft()}
             selected={false}
             left={base + (index - 2) * separation}
-            display={index < 5 || index > 9 ? true : true}
           ></Item>
         );
       } else if (index > 2) {
@@ -68,27 +84,26 @@ const Exp1 = () => {
           <Item
             key={movie.id}
             movie={movie}
-            onSelected={() => handleSelection(itemIndex)}
+            onClick={() => moveRight()}
             selected={false}
             left={base + (index - 2) * separation}
-            display={index < 7 || index > 11 ? true : true}
           ></Item>
         );
       } else {
-        return (
-          <Item
-            key={movie.id}
-            movie={movie}
-            selected
-            left={base}
-            display={true}
-          ></Item>
-        );
+        return <Item key={movie.id} movie={movie} selected left={base}></Item>;
       }
     });
   };
 
-  return <StyledContainer>{list.length > 0 && renderItems()}</StyledContainer>;
+  return (
+    <div>
+      <StyledContainer>
+        <CSSTransitionGroup transitionName={direction}>
+          {items.length > 0 && renderItems()}
+        </CSSTransitionGroup>
+      </StyledContainer>
+    </div>
+  );
 };
 
 export default Exp1;
