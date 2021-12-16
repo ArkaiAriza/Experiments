@@ -235,5 +235,5 @@ export const translateBrushCoordinates = (w, h, p) => {
   nW = (p.w * w) / width;
   nH = (p.h * h) / height;
 
-  return [nX, nY, nW, nH];
+  return { x: nX, y: nY, w: nW, h: nH };
 };
