@@ -1,4 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+
+const StyledParallax = styled.div.attrs(
+  ({ top, url, translate, parallaxOrigin }) => ({
+    style: {
+      top: top,
+      background: `url(${url}) center center / cover no-repeat`,
+      transform: `translate3d(${translate}) scale(1.1, 1.1)`,
+      transformOrigin: parallaxOrigin,
+    },
+  })
+)`
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+`;
 
 const Parallax = (props) => {
   const { url, modifyTop, reverse } = props;
@@ -23,21 +39,14 @@ const Parallax = (props) => {
   }, []);
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: modifyTop
-          ? `${-(-400 + 250 * Math.floor(window.scrollY / 310))}px`
-          : 0,
-        height: '100vh',
-        width: '100vw',
-        background: `url(${url}) center center / cover no-repeat`,
-        transform: `translate3d(${reverse ? -x : x}%, ${
-          reverse ? y : -y
-        }%, 0px) scale(1.1, 1.1)`,
-        transformOrigin: `${reverse ? 'left bottom' : 'right top'}`,
-      }}
-    ></div>
+    <StyledParallax
+      top={
+        modifyTop ? `${-(-400 + 250 * Math.floor(window.scrollY / 310))}px` : 0
+      }
+      translate={reverse ? `${-x}%, ${y}%, 0px` : `${x}%, ${-y}%, 0px`}
+      parallaxOrigin={reverse ? 'left bottom' : 'right top'}
+      url={url}
+    />
   );
 };
 

@@ -13,7 +13,7 @@
     "react-scripts": "3.4.3",
     "react-soundplayer": "^1.0.5",
     "react-transition-group": "^1.2.1",
-    "styled-components": "^5.1.1",
+    "styled-components": "^5.3.3",
     "write-file-p": "^1.0.8",
     "xfs": "^0.2.6",
     "xlsx": "^0.16.9"
